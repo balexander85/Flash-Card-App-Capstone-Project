@@ -1,9 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
 import Header from "./Header";
 import {listDecks, createDeck, deleteDeck, readDeck, createCard, readCard} from "../utils/api";
-import {Link, Route, Switch, useHistory, useParams, useRouteMatch} from "react-router-dom";
+import {Link, Route, Switch, useHistory, useParams} from "react-router-dom";
 import NotFound from "./NotFound";
-import {AddCardButton, CreateDeckButton, DeleteButton} from "./Common";
+import {AddCardButton, CreateDeckButton, DeleteButton, EditButton, StudyButton} from "./Common";
 import {CreateDeckForm} from "./CreateDeck";
 
 
@@ -78,7 +78,7 @@ const AddCard = () => {
 
 const EditCard = () => {
     const [card, setCard] = useState({});
-    const {deckId, cardId} = useParams();
+    const {cardId} = useParams();
     const initialFormData = {
         front: card.front,
         back: card.back,
@@ -98,7 +98,7 @@ const EditCard = () => {
         readCard(cardId, abortController.signal)
             .then(setCard)
             .catch(console.log);
-    }, [deckId]);
+    }, [cardId]);
 
     return (
         <Fragment>
@@ -152,36 +152,34 @@ const StudyScreen = () => {
             .catch(console.log);
     }, [deckId]);
 
-    if (deck.cards.length < 3) {
-        return (
-            <section>
-                <h2>Study</h2>
-                <h2>{deck.name}</h2>
-                <h2>Not enough cards.</h2>
-                <p>The minimum is 3 cards to study. There are {deck.cards.length} cards in this deck</p>
-                <AddCardButton deckId={deckId} onClickHandler={() => console.log(`Adding cards to '${deckId}' deck`)}/>
-            </section>
-        )
-    } else {
-        return (
-            <div>
-                <h2>Study</h2>
-                <h2>{deck.name}</h2>
-                <div style={{border: '1px solid black', padding: '10px'}}>
-                    <h4>Card {cardIndex + 1} of {deck.cards.length}</h4>
-                    <Fragment>
-                        {isFlipped ? <div>{deck.cards[cardIndex].back}</div> : <div>{deck.cards[cardIndex].front}</div>}
-                        <button className="btn-lg" onClick={() => setIsFlipped(!isFlipped)}>Flip</button>
-                        {isFlipped && <button className="btn-lg btn-primary" onClick={() => {
-                            setCardIndex(cardIndex => cardIndex + 1);
-                            setIsFlipped(false);
-                        }}>Next</button>}
-                    </Fragment>
-                </div>
-                {(isFlipped && cardIndex + 1 === deck.cards.length) && window.confirm('Restart deck?') ? setCardIndex(0) : null}
-            </div>
-        )
-    }
+    return (
+        <section>
+            <h2>Study</h2>
+            <h2>{deck.name}</h2>
+            {deck.cards.length < 3 ? (
+                <Fragment>
+                    <h2>Not enough cards.</h2>
+                    <p>The minimum is 3 cards to study. There are {deck.cards.length} cards in this deck</p>
+                    <AddCardButton deckId={deckId} onClickHandler={() => console.log(`Adding cards to '${deckId}' deck`)}/>
+                </Fragment>
+            ) : (
+                <Fragment>
+                    <div style={{border: '1px solid black', padding: '10px'}}>
+                        <h4>Card {cardIndex + 1} of {deck.cards.length}</h4>
+                        <Fragment>
+                            {isFlipped ? <div>{deck.cards[cardIndex].back}</div> : <div>{deck.cards[cardIndex].front}</div>}
+                            <button className="btn-lg" onClick={() => setIsFlipped(!isFlipped)}>Flip</button>
+                            {isFlipped && <button className="btn-lg btn-primary" onClick={() => {
+                                setCardIndex(cardIndex => cardIndex + 1);
+                                setIsFlipped(false);
+                            }}>Next</button>}
+                        </Fragment>
+                    </div>
+                    {(isFlipped && cardIndex + 1 === deck.cards.length) && window.confirm('Restart deck?') ? setCardIndex(0) : null}
+                </Fragment>
+            )}
+        </section>
+    )
 }
 
 const EditDeck = () => {
@@ -263,9 +261,8 @@ const Deck = () => {
         <section key={deckId}>
             <h3>{deck.name}</h3>
             <p>{deck.description}</p>
-            <button>Edit</button>
-            <button>Study</button>
-            <button>Add Cards</button>
+            <EditButton path={`/decks/${deckId}/edit`} />
+            <StudyButton deckId={deckId} />
             <AddCardButton deckId={deckId} onClickHandler={() => console.log(`Adding cards to '${deckId}' deck`)} />
             <DeleteButton onClickHandler={() => console.log(`Deleting '${deckId}' deck`)}/>
             <h2>Cards</h2>
@@ -274,7 +271,7 @@ const Deck = () => {
                         <section style={{border: '1px solid black', padding: '10px'}} key={card.id}>
                             <div>{card.front}</div>
                             <div>{card.back}</div>
-                            <button>Edit</button>
+                            <EditButton path={`/decks/${deckId}/cards/${card.id}/edit`} />
                             <DeleteButton onClickHandler={() => console.log(`Deleting '${card.id}' card`)}/>
                         </section>
                     )
@@ -325,7 +322,6 @@ const DeckCard = ({deck, handleDelete}) => {
 const DeckCardList = ({decks, handleDelete}) => {
     return decks.map((deck) => <DeckCard key={deck.id} deck={deck} handleDelete={handleDelete}/>)
 }
-
 
 const Layout = () => {
     const [decks, setDecks] = useState([]);
