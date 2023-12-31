@@ -4,8 +4,6 @@ import {listDecks, createDeck, deleteDeck, readDeck, createCard, readCard} from 
 import {Link, Route, Switch, useHistory, useParams} from "react-router-dom";
 import NotFound from "./NotFound";
 import {AddCardButton, CreateDeckButton, DeleteButton, EditButton, StudyButton} from "./Common";
-import {CreateDeckForm} from "./CreateDeck";
-
 
 const AddCard = () => {
     const [deck, setDeck] = useState({cards: []});
@@ -246,6 +244,60 @@ const EditDeck = () => {
     )
 }
 
+const DeckForm = ({handleNewDeck, deck = {}}) => {
+    const initialFormData = {
+        name: deck.name || '',
+        description: deck.description || '',
+    }
+    const [formData, setFormData] = useState(initialFormData);
+
+    const handleChange = ({target}) => {
+        setFormData({...formData, [target.name]: target.value});
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        handleNewDeck(formData);
+    }
+
+    return (
+        <Fragment>
+            <h2>Create Deck</h2>
+            <form name="create" onSubmit={handleSubmit}>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td><label htmlFor="name">Name</label></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input name="name" value={formData.name} onChange={handleChange} required={true}/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label htmlFor="description">Description</label></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <textarea name="description" value={formData.description} onChange={handleChange}/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <Link to="/">
+                                <button type="reset" className="btn-secondary">Cancel</button>
+                            </Link>
+                        </td>
+                        <td>
+                            <button type="submit" className="btn-primary">Submit</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </Fragment>
+    )
+}
 const Deck = () => {
     const [deck, setDeck] = useState({cards: []});
     const {deckId} = useParams();
@@ -319,8 +371,13 @@ const DeckCard = ({deck, handleDelete}) => {
         </section>
     )
 }
-const DeckCardList = ({decks, handleDelete}) => {
-    return decks.map((deck) => <DeckCard key={deck.id} deck={deck} handleDelete={handleDelete}/>)
+const DeckList = ({decks, handleDelete}) => {
+    return (
+        <Fragment>
+            <CreateDeckButton />
+            {decks.map((deck) => <DeckCard key={deck.id} deck={deck} handleDelete={handleDelete}/>)}
+        </Fragment>
+    )
 }
 
 const Layout = () => {
@@ -363,11 +420,10 @@ const Layout = () => {
             <div className="container">
                 <Switch>
                     <Route exact path="/">
-                        <CreateDeckButton/>
-                        <DeckCardList decks={decks} handleDelete={handleDelete}/>
+                        <DeckList decks={decks} handleDelete={handleDelete}/>
                     </Route>
                     <Route path="/decks/new">
-                        <CreateDeckForm handleNewDeck={handleNewDeck}/>
+                        <DeckForm handleNewDeck={handleNewDeck} />
                     </Route>
                     <Route exact path={"/decks/:deckId"}>
                         <Deck/>
