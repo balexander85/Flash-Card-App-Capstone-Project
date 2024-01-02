@@ -1,9 +1,59 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Header from "./Header";
-import { listDecks, createDeck, deleteDeck, readDeck, createCard, readCard, updateDeck, updateCard } from "../utils/api";
+import {
+  listDecks,
+  createDeck,
+  deleteDeck,
+  readDeck,
+  createCard,
+  readCard,
+  updateDeck,
+  updateCard,
+  deleteCard
+} from "../utils/api";
 import { Link, Route, Switch, useHistory, useParams } from "react-router-dom";
 import NotFound from "./NotFound";
 import { AddCardButton, CreateDeckButton, DeleteButton, EditButton, StudyButton, ViewButton } from "./Common";
+
+const CardForm = ({ handleSubmit, handleChange, formData }) => {
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <table>
+        <tbody>
+          <tr>
+            <td><label htmlFor="front">Front</label></td>
+          </tr>
+          <tr>
+            <td>
+              <textarea name="front" placeholder="Front side of card" value={formData.front}
+                onChange={handleChange} required={true}/>
+            </td>
+          </tr>
+          <tr>
+            <td><label htmlFor="back">Back</label></td>
+          </tr>
+          <tr>
+            <td>
+              <textarea name="back" placeholder="Back side of card" value={formData.back}
+                onChange={handleChange} required={true}/>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <Link to="/">
+                <button type="reset" className="btn-secondary">Cancel</button>
+              </Link>
+            </td>
+            <td>
+              <button type="submit" className="btn-primary">Save</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  );
+};
 
 const AddCard = () => {
   const [deck, setDeck] = useState({ cards: [] });
@@ -31,7 +81,7 @@ const AddCard = () => {
     event.preventDefault();
     const abortController = new AbortController();
     createCard(deckId, formData, abortController.signal)
-      .then(() => history.push("/"))
+      .then(() => history.push(`/decks/${deckId}`))
       .catch(err => console.error(err));
     return () => abortController.abort();
   };
@@ -40,40 +90,7 @@ const AddCard = () => {
     <Fragment>
       <h2>Add Card</h2>
       <h2>{deck.name}</h2>
-      <form onSubmit={handleSubmit}>
-        <table>
-          <tbody>
-            <tr>
-              <td><label htmlFor="front">Front</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="front" placeholder="Front side of card" value={formData.front}
-                  onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td><label htmlFor="back">Back</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="back" placeholder="Back side of card" value={formData.back}
-                  onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Link to="/">
-                  <button type="reset" className="btn-secondary">Cancel</button>
-                </Link>
-              </td>
-              <td>
-                <button type="submit" className="btn-primary">Save</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+      <CardForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
     </Fragment>
   );
 };
@@ -110,38 +127,7 @@ const EditCard = () => {
   return (
     <Fragment>
       <h2>Edit Card</h2>
-      <form onSubmit={handleSubmit}>
-        <table>
-          <tbody>
-            <tr>
-              <td><label htmlFor="front">Front</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="front" value={formData.front} onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td><label htmlFor="back">Back</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="back" value={formData.back} onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Link to="/">
-                  <button type="reset" className="btn-secondary">Cancel</button>
-                </Link>
-              </td>
-              <td>
-                <button type="submit" className="btn-primary">Save</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+      <CardForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
     </Fragment>
   );
 };
@@ -223,6 +209,68 @@ const StudyScreen = () => {
   );
 };
 
+const DeckForm = ({ handleSubmit, handleChange, formData }) => {
+
+  return (
+    <form name="create" onSubmit={handleSubmit}>
+      <table>
+        <tbody>
+          <tr>
+            <td><label htmlFor="name">Name</label></td>
+          </tr>
+          <tr>
+            <td>
+              <input name="name" placeholder="Deck name" value={formData.name} onChange={handleChange} required={true}/>
+            </td>
+          </tr>
+          <tr>
+            <td><label htmlFor="description">Description</label></td>
+          </tr>
+          <tr>
+            <td>
+              <textarea name="description" placeholder="Deck description" value={formData.description} onChange={handleChange}/>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <Link to="/">
+                <button type="reset" className="btn-secondary">Cancel</button>
+              </Link>
+            </td>
+            <td>
+              <button type="submit" className="btn-primary">Submit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  );
+};
+
+const CreateDeck = ({ handleNewDeck }) => {
+  const initialFormData = {
+    name: "",
+    description: "",
+  };
+  const [formData, setFormData] = useState(initialFormData);
+
+  const handleChange = ({ target }) => {
+    setFormData({ ...formData, [target.name]: target.value });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    handleNewDeck(formData);
+  };
+
+  return (
+    <Fragment>
+      <h2>Create Deck</h2>
+      <DeckForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
+    </Fragment>
+  );
+};
+
 const EditDeck = () => {
   const history = useHistory();
   const { deckId } = useParams();
@@ -255,99 +303,24 @@ const EditDeck = () => {
   return (
     <Fragment>
       <h2>Edit Deck</h2>
-      <form name="create" onSubmit={handleSubmit}>
-        <table>
-          <tbody>
-            <tr>
-              <td><label htmlFor="name">Name</label></td>
-            </tr>
-            <tr>
-              <td>
-                <input name="name" value={formData.name} onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td><label htmlFor="description">Description</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="description" value={formData.description} onChange={handleChange}/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Link to="/">
-                  <button type="reset" className="btn-secondary">Cancel</button>
-                </Link>
-              </td>
-              <td>
-                <button type="submit" className="btn-primary">Submit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+      <DeckForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
     </Fragment>
   );
 };
 
-const DeckForm = ({ handleNewDeck, deck = {} }) => {
-  const initialFormData = {
-    name: deck.name || "",
-    description: deck.description || "",
-  };
-  const [formData, setFormData] = useState(initialFormData);
-
-  const handleChange = ({ target }) => {
-    setFormData({ ...formData, [target.name]: target.value });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    handleNewDeck(formData);
-  };
-
-  return (
-    <Fragment>
-      <h2>Create Deck</h2>
-      <form name="create" onSubmit={handleSubmit}>
-        <table>
-          <tbody>
-            <tr>
-              <td><label htmlFor="name">Name</label></td>
-            </tr>
-            <tr>
-              <td>
-                <input name="name" value={formData.name} onChange={handleChange} required={true}/>
-              </td>
-            </tr>
-            <tr>
-              <td><label htmlFor="description">Description</label></td>
-            </tr>
-            <tr>
-              <td>
-                <textarea name="description" value={formData.description} onChange={handleChange}/>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Link to="/">
-                  <button type="reset" className="btn-secondary">Cancel</button>
-                </Link>
-              </td>
-              <td>
-                <button type="submit" className="btn-primary">Submit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </Fragment>
-  );
-};
-const Deck = () => {
+const Deck = ({ handleDeckDelete }) => {
   const [deck, setDeck] = useState({ cards: [] });
   const { deckId } = useParams();
+
+  const handleCardDelete = (indexToDelete) => {
+    const abortController = new AbortController();
+    deleteCard(indexToDelete, abortController.signal)
+      .then(() => {
+        window.location.reload();
+      })
+      .catch(err => console.error(err));
+    return () => abortController.abort();
+  };
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -364,7 +337,7 @@ const Deck = () => {
       <EditButton path={`/decks/${deckId}/edit`}/>
       <StudyButton deckId={deckId}/>
       <AddCardButton deckId={deckId} onClickHandler={() => console.log(`Adding cards to '${deckId}' deck`)}/>
-      <DeleteButton onClickHandler={() => console.log(`Deleting '${deckId}' deck`)}/>
+      <DeleteButton onClickHandler={() => window.confirm("Delete this deck?") && handleDeckDelete(deck.id)}/>
       <h2>Cards</h2>
       {deck.cards.map((card) => {
         return (
@@ -372,7 +345,7 @@ const Deck = () => {
             <div>{card.front}</div>
             <div>{card.back}</div>
             <EditButton path={`/decks/${deckId}/cards/${card.id}/edit`}/>
-            <DeleteButton onClickHandler={() => console.log(`Deleting '${card.id}' card`)}/>
+            <DeleteButton onClickHandler={() => window.confirm("Delete this card?") && handleCardDelete(card.id)}/>
           </section>
         );
       }
@@ -381,29 +354,25 @@ const Deck = () => {
   );
 };
 
-const DeckCard = ({ deck, handleDelete }) => {
-  const deckCardCount = deck.cards.length;
-
-  return (
-    <section style={{ border: "1px solid black", padding: "10px" }} key={deck.id}>
-      <h3 className="card-title">
-        {deck.name}
-      </h3>
-      <div>{deckCardCount} cards</div>
-      <div className="card-description">
-        {deck.description}
-      </div>
-      <ViewButton deckId={deck.id} />
-      <StudyButton deckId={deck.id} />
-      <DeleteButton onClickHandler={() => window.confirm("Delete this deck?") && handleDelete(deck.id)}/>
-    </section>
-  );
-};
-const DeckList = ({ decks, handleDelete }) => {
+const DeckList = ({ decks, handleDeckDelete }) => {
   return (
     <Fragment>
       <CreateDeckButton/>
-      {decks.map((deck) => <DeckCard key={deck.id} deck={deck} handleDelete={handleDelete}/>)}
+      {decks.map((deck) => (
+        <section style={{ border: "1px solid black", padding: "10px" }} key={deck.id}>
+          <h3 className="card-title">
+            {deck.name}
+          </h3>
+          <div>{deck.cards ? deck.cards.length : 0} cards</div>
+          <div className="card-description">
+            {deck.description}
+          </div>
+          <ViewButton deckId={deck.id}/>
+          <StudyButton deckId={deck.id}/>
+          <DeleteButton onClickHandler={() => window.confirm("Delete this deck?") && handleDeckDelete(deck.id)}/>
+        </section>
+      )
+      )}
     </Fragment>
   );
 };
@@ -424,7 +393,7 @@ const Layout = () => {
     return () => abortController.abort();
   };
 
-  const handleDelete = (indexToDelete) => {
+  const handleDeckDelete = (indexToDelete) => {
     const abortController = new AbortController();
     deleteDeck(indexToDelete, abortController.signal)
       .then(() => {
@@ -450,13 +419,13 @@ const Layout = () => {
       <div className="container">
         <Switch>
           <Route exact path="/">
-            <DeckList decks={decks} handleDelete={handleDelete}/>
+            <DeckList decks={decks} handleDeckDelete={handleDeckDelete} />
           </Route>
           <Route path="/decks/new">
-            <DeckForm handleNewDeck={handleNewDeck}/>
+            <CreateDeck handleNewDeck={handleNewDeck}/>
           </Route>
           <Route exact path={"/decks/:deckId"}>
-            <Deck/>
+            <Deck handleDeckDelete={handleDeckDelete} />
           </Route>
           <Route exact path={"/decks/:deckId/edit"}>
             <EditDeck/>
