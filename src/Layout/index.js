@@ -374,7 +374,7 @@ const Deck = () => {
 };
 
 const DeckCard = ({ deck, handleDelete }) => {
-  const deckCardCount = deck.cards?.length;
+  const deckCardCount = deck.cards.length;
 
   return (
     <section style={{ border: "1px solid black", padding: "10px" }} key={deck.id}>
