@@ -24,6 +24,7 @@ const AddCard = () => {
     readDeck(deckId, abortController.signal)
       .then(setDeck)
       .catch(console.log);
+    return () => abortController.abort();
   }, [deckId]);
 
   const handleSubmit = (event) => {
@@ -32,6 +33,7 @@ const AddCard = () => {
     createCard(deckId, formData, abortController.signal)
       .then(() => history.push("/"))
       .catch(err => console.error(err));
+    return () => abortController.abort();
   };
 
   return (
@@ -94,6 +96,7 @@ const EditCard = () => {
         history.push(`/decks/${deckId}`);
       })
       .catch(console.error);
+    return () => abortController.abort();
   };
 
   useEffect(() => {
@@ -101,6 +104,7 @@ const EditCard = () => {
     readCard(cardId, abortController.signal)
       .then(setFormData)
       .catch(console.log);
+    return () => abortController.abort();
   }, [cardId]);
 
   return (
@@ -154,6 +158,7 @@ const StudyScreen = () => {
     readDeck(deckId, abortController.signal)
       .then(setDeck)
       .catch(console.error);
+    return () => abortController.abort();
   }, [deckId]);
 
   const handleNextButtonClick = () => {
