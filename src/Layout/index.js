@@ -236,6 +236,7 @@ const EditDeck = () => {
         history.push(`/decks/${deckId}`);
       })
       .catch(console.error);
+    return () => abortController.abort();
   };
 
   useEffect(() => {
@@ -243,6 +244,7 @@ const EditDeck = () => {
     readDeck(deckId, abortController.signal)
       .then(setFormData)
       .catch(console.error);
+    return () => abortController.abort();
   }, [deckId]);
 
   return (
@@ -347,6 +349,7 @@ const Deck = () => {
     readDeck(deckId, abortController.signal)
       .then(setDeck)
       .catch(console.log);
+    return () => abortController.abort();
   }, [deckId]);
 
   return (
@@ -413,6 +416,7 @@ const Layout = () => {
         history.push("/");
       })
       .catch(err => console.error(err));
+    return () => abortController.abort();
   };
 
   const handleDelete = (indexToDelete) => {
@@ -423,6 +427,7 @@ const Layout = () => {
         history.push("/");
       })
       .catch(err => console.error(err));
+    return () => abortController.abort();
   };
 
   useEffect(() => {
