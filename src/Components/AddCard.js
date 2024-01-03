@@ -25,7 +25,10 @@ const AddCard = () => {
         event.preventDefault();
         const abortController = new AbortController();
         createCard(deckId, formData, abortController.signal)
-            .then(() => history.push(`/decks/${deckId}`))
+            .then(() => {
+                setDeck({...deck, cards: [...deck.cards, formData]});
+                history.push(`/decks/${deckId}`);
+            })
             .catch(console.error);
         return () => abortController.abort();
     };

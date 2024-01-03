@@ -1,7 +1,9 @@
-import {Link} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import React from "react";
 
 const CardForm = ({ handleSubmit, formData, setFormData }) => {
+    const history = useHistory();
+    const { deckId } = useParams();
 
     const handleChange = ({ target }) => {
         setFormData({ ...formData, [target.name]: target.value });
@@ -31,9 +33,7 @@ const CardForm = ({ handleSubmit, formData, setFormData }) => {
                 </tr>
                 <tr>
                     <td>
-                        <Link to="/">
-                            <button type="reset" className="btn-secondary">Cancel</button>
-                        </Link>
+                        <button type="reset" className="btn-secondary" onClick={() => history.push(`/decks/${deckId}`)}>Cancel</button>
                     </td>
                     <td>
                         <button type="submit" className="btn-primary">Save</button>
