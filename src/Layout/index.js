@@ -7,7 +7,10 @@ import {
 } from "../utils/api";
 import { Link, Route, Switch, useHistory } from "react-router-dom";
 import NotFound from "./NotFound";
-import { CreateDeck, DeckList, Deck, EditDeck } from "./Decks";
+import Home from "../Components/Home";
+import CreateDeck from "../Components/CreateDeck";
+import EditDeck from "../Components/EditDeck";
+import Deck from "../Components/Deck";
 import AddCard from "../Components/AddCard";
 import EditCard from "../Components/EditCard";
 import StudyScreen from "../Components/Study";
@@ -67,7 +70,7 @@ const Layout = () => {
         <NavBar />
         <Switch>
           <Route exact path="/">
-            <DeckList decks={decks} handleDeckDelete={handleDeckDelete} />
+            <Home decks={decks} handleDeckDelete={handleDeckDelete} />
           </Route>
           <Route path="/decks/new">
             <CreateDeck handleNewDeck={handleNewDeck}/>
