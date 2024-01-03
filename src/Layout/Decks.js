@@ -3,7 +3,11 @@ import React, {Fragment, useEffect, useState} from "react";
 import {deleteCard, readDeck, updateDeck} from "../utils/api";
 import {AddCardButton, CreateDeckButton, DeleteButton, EditButton, StudyButton, ViewButton} from "./Common";
 
-const DeckForm = ({ handleSubmit, handleChange, formData }) => {
+const DeckForm = ({ handleSubmit, setFormData, formData }) => {
+
+    const handleChange = ({ target }) => {
+        setFormData({ ...formData, [target.name]: target.value });
+    };
 
     return (
         <form name="create" onSubmit={handleSubmit}>
@@ -46,12 +50,7 @@ export const CreateDeck = ({ handleNewDeck }) => {
         name: "",
         description: "",
     };
-    const [formData, setFormData] = useState(initialFormData);
-
-    const handleChange = ({ target }) => {
-        setFormData({ ...formData, [target.name]: target.value });
-    };
-
+    const [formData, setFormData] = useState(initialFormData)
     const handleSubmit = (event) => {
         event.preventDefault();
         handleNewDeck(formData);
@@ -60,7 +59,7 @@ export const CreateDeck = ({ handleNewDeck }) => {
     return (
         <Fragment>
             <h2>Create Deck</h2>
-            <DeckForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
+            <DeckForm handleSubmit={handleSubmit} setFormData={setFormData} formData={formData} />
         </Fragment>
     );
 };
@@ -69,10 +68,6 @@ export const EditDeck = () => {
     const history = useHistory();
     const { deckId } = useParams();
     const [formData, setFormData] = useState({ name: "", description: "" });
-
-    const handleChange = ({ target }) => {
-        setFormData({ ...formData, [target.name]: target.value });
-    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -97,7 +92,7 @@ export const EditDeck = () => {
     return (
         <Fragment>
             <h2>Edit Deck</h2>
-            <DeckForm handleSubmit={handleSubmit} handleChange={handleChange} formData={formData} />
+            <DeckForm handleSubmit={handleSubmit} setFormData={setFormData} formData={formData} />
         </Fragment>
     );
 };

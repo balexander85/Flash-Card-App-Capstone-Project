@@ -69,7 +69,7 @@ export const AddCard = () => {
         const abortController = new AbortController();
         createCard(deckId, formData, abortController.signal)
             .then(() => history.push(`/decks/${deckId}`))
-            .catch(err => console.error(err));
+            .catch(console.error);
         return () => abortController.abort();
     };
 
