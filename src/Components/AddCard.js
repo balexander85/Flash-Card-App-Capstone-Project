@@ -17,7 +17,7 @@ const AddCard = () => {
         const abortController = new AbortController();
         readDeck(deckId, abortController.signal)
             .then(setDeck)
-            .catch(console.log);
+            .catch(console.error);
         return () => abortController.abort();
     }, [deckId]);
 
