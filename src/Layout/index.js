@@ -398,7 +398,7 @@ const Layout = () => {
     deleteDeck(indexToDelete, abortController.signal)
       .then(() => {
         setDecks(currentDecks => currentDecks.filter(deck => deck.id !== indexToDelete));
-        window.location.reload();
+        history.push("/");
       })
       .catch(err => console.error(err));
     return () => abortController.abort();
