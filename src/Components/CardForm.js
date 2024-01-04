@@ -1,12 +1,17 @@
 import {useHistory, useParams} from "react-router-dom";
 import React from "react";
 
+/* CardForm component to be used for adding/editing cards */
 const CardForm = ({ handleSubmit, formData, setFormData }) => {
     const history = useHistory();
     const { deckId } = useParams();
 
     const handleChange = ({ target }) => {
         setFormData({ ...formData, [target.name]: target.value });
+    };
+
+    const handleDone = () => {
+        history.push(`/decks/${deckId}`)
     };
 
     return (
@@ -33,7 +38,7 @@ const CardForm = ({ handleSubmit, formData, setFormData }) => {
                 </tr>
                 <tr>
                     <td>
-                        <button type="reset" className="btn-secondary" onClick={() => history.push(`/decks/${deckId}`)}>Cancel</button>
+                        <button type="reset" className="btn-secondary" onClick={handleDone}>Done</button>
                     </td>
                     <td>
                         <button type="submit" className="btn-primary">Save</button>

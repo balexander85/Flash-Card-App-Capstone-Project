@@ -3,6 +3,7 @@ import {useHistory, useParams} from "react-router-dom";
 import {createCard, readDeck} from "../utils/api";
 import CardForm from "./CardForm";
 
+/* AddCard component to add new card and reset form after submit */
 const AddCard = () => {
     const [deck, setDeck] = useState({ cards: [] });
     const { deckId } = useParams();
@@ -27,7 +28,8 @@ const AddCard = () => {
         createCard(deckId, formData, abortController.signal)
             .then(() => {
                 setDeck({...deck, cards: [...deck.cards, formData]});
-                history.push(`/decks/${deckId}`);
+                history.go(0)
+                setFormData(initialFormData);
             })
             .catch(console.error);
         return () => abortController.abort();

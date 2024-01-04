@@ -3,6 +3,7 @@ import React, {Fragment, useEffect, useState} from "react";
 import {readCard, updateCard} from "../utils/api";
 import CardForm from "./CardForm";
 
+/* EditCard component to edit existing card */
 const EditCard = () => {
     const history = useHistory();
     const { deckId, cardId } = useParams();
